@@ -13,4 +13,7 @@ interface File{
     
     public function setId(?int $id);
     public function getId();
+    
+    public function getWidth();
+    public function getHeight();
 }

@@ -75,6 +75,8 @@ class ApiView{
             "name" => ( $file->getName() === null ? $file->getVirtualPath()->name() : $file->getName() ),
             "type" => $file->getType(),
             "file_url" => strval($file->getUrl()),
+            "width" => $file->getWidth(),
+            "height" => $file->getHeight(),
             "thumbnails" => [],
         ];
         foreach( $this->thumbnailer->allThumbs($file) as $thumb ){

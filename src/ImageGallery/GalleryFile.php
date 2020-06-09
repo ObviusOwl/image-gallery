@@ -18,5 +18,13 @@ class GalleryFile extends AbstractFile implements File{
         // TODO
         return "";
     }
+
+    public function getWidth(){
+        return 0;
+    }
+
+    public function getHeight(){
+        return 0;
+    }
     
 }

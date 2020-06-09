@@ -60,11 +60,25 @@ class ImageFile extends AbstractFile implements File{
         return $this->url;
     }
     
-    public function getImage(){
+    protected function loadImage(){
         if( $this->image === null ){
             $this->image = new \Imagick(strval($this->realPath));
         }
+    }
+
+    public function getImage(){
+        $this->loadImage();
         return clone $this->image;
+    }
+
+    public function getWidth(){
+        $this->loadImage();
+        return $this->image->getImageWidth();
+    }
+
+    public function getHeight(){
+        $this->loadImage();
+        return $this->image->getImageHeight();
     }
     
 }

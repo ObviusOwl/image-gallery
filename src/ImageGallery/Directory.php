@@ -32,5 +32,13 @@ class Directory extends AbstractFile implements File{
     public function getUrl(){
         return $this->url;
     }
+    
+    public function getWidth(){
+        return 0;
+    }
+
+    public function getHeight(){
+        return 0;
+    }
 
 }
