@@ -46,7 +46,7 @@ class ImageFileBrowser{
     public function fileFactory(Path $virtualPath, string $type){
         // must be able to produce objects those real path is not accessible
         if( ! explode("/", $type)[0] === "image" ){
-            throw new FileNotFoundError(strval($virtualFullPath));
+            throw new FileNotFoundError(strval($virtualPath));
         }
         $virtualPath = $virtualPath->resolve();
         list($virtualFullPath, $virtualPath) = $this->splitPath($virtualPath);

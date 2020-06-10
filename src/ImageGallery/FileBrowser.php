@@ -17,7 +17,7 @@ class FileBrowser{
         $this->fsList[] = new ImageFileBrowser($this->conf, $imgVirtPath, $imgRealPath, $imgBaseUrl);
         
         $gaVirtPath = new Path("/galleries");
-        $this->fsList[] = new GalleryFileBrowser($this->conf, $gaVirtPath);
+        $this->fsList[] = new GalleryFileBrowser($this->conf, $this->db, $gaVirtPath);
     }
 
     public function getRootPath(){

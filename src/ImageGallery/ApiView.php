@@ -54,17 +54,24 @@ class ApiView{
         return array_map( [$this, "viewThumbnail"], $thumbs);
     }
     
-    public function viewThumbnail(Thumbnail $thumb){
+    public function viewThumbnail(Thumbnail $thumb, bool $showFile=true){
         $file = $thumb->getFile();
         $data = [
             "size_name" => $thumb->getSizeName(),
             "file_url" => $thumb->getUrl(),
-            "file" => [
+            "width" => $thumb->getWidth(),
+            "height" => $thumb->getHeight(),
+            "aspect_ratio" => 0,
+        ];
+        $data["aspect_ratio"] = $this->calcAspectRatio($data["width"], $data["height"]);
+        
+        if( $showFile ){
+            $data["file"] = [
                 "id" => $file->getId(),
                 "path" => strval($file->getVirtualPath()),
                 "file_url" => strval($file->getUrl()),
-            ],
-        ];
+            ];
+        }
         return $data;
     }
     
@@ -77,14 +84,19 @@ class ApiView{
             "file_url" => strval($file->getUrl()),
             "width" => $file->getWidth(),
             "height" => $file->getHeight(),
+            "aspect_ratio" => 0,
             "thumbnails" => [],
         ];
+        $data["aspect_ratio"] = $this->calcAspectRatio($data["width"], $data["height"]);
+        
         foreach( $this->thumbnailer->allThumbs($file) as $thumb ){
-            $data["thumbnails"][] = [
-                "size_name" => $thumb->getSizeName(),
-                "file_url" => strval($thumb->getUrl()),
-            ];
+            $data["thumbnails"][] = $this->viewThumbnail($thumb, false);
         }
+        
+        if( $file instanceof GalleryFile ){
+            $data["gallery_id"] = $file->getGalleryId();
+        }
+        
         return $data;
     }
     
@@ -93,6 +105,13 @@ class ApiView{
             "files" => array_map( [$this, "viewFile"], $files),
         ];
         return $data;
+    }
+    
+    protected function calcAspectRatio(int $width, int $height){
+        if( $height == 0 ){
+            return 0;
+        }
+        return $width / $height;
     }
     
 }

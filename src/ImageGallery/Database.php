@@ -54,7 +54,7 @@ class Database{
             $file->setType($type);
         }else if( $file instanceof GalleryFile ){
             $file->setId(intval($id));
-            // TODO set gallery id
+            $file->setGalleryId(intval($galleryId));
         }
         $file->clearTaint();
         return $file;
@@ -110,6 +110,12 @@ class Database{
         ";
         $files = $this->queryFiles($q, [ ":id"=>$gallery->getId() ]);
         $gallery->setFiles(...$files);
+
+        foreach( $gallery->getFiles() as $file ){
+            if( $file instanceof GalleryFile ){
+                $this->galleryFileLoad($file);
+            }
+        }
         return $gallery;
     }
     
@@ -323,7 +329,7 @@ class Database{
             ":name" => $file->getName(),
             ":descr" => null,
             ":type" => $file->getType(),
-            ":gid" => null,
+            ":gid" => ( $file instanceof GalleryFile ? $file->getGalleryId() : null ),
         ]);
         $id = $this->dbh->lastInsertId();
         return $this->getFileById($id);
@@ -342,9 +348,11 @@ class Database{
 
         $taintGetter = [
             "name" => function ($f){ return $f->getName(); },
+            "gallery_id" => function ($f){ return $f->getGalleryId(); },
         ];
         $taintAttrMap = [
             "name" => "name",
+            "gallery_id" => "gallery_id",
         ];
         
         $tainted = $file->getTainted();
@@ -368,6 +376,21 @@ class Database{
         
         $sth = $this->dbh->prepare($q);
         $sth->execute($params);
+    }
+    
+    public function galleryFileLoad(GalleryFile $file){
+        $id = $file->getGalleryId();
+        if( $id === null ){
+            throw new DatabaseError("galleryId must be set");
+        }
+        
+        $ga = $this->getGalleryById($id);
+        if( $ga === null ){
+            throw new DatabaseError("Gallery with id $id not found");
+        }
+        $this->galleryLoadThumbnails($ga);
+        $file->setGallery($ga);
+        return $ga;
     }
     
 }

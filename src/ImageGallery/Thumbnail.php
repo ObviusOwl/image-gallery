@@ -37,6 +37,24 @@ class Thumbnail{
         return intval($prop);
     }
     
+    public function getWidth(){
+        $this->loadImage();
+        try{
+            return $this->image->getImageWidth();
+        }catch( \Exception $e ){
+            return 0;
+        }
+    }
+
+    public function getHeight(){
+        $this->loadImage();
+        try{
+            return $this->image->getImageHeight();
+        }catch( \Exception $e ){
+            return 0;
+        }
+    }
+    
     public function exists(){
         return $this->path->exists();
     }

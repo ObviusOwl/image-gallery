@@ -29,12 +29,16 @@ class Thumbnailer{
     public function thumb(File $file, string $sizeName){
         if( $file instanceof Imagefile ){
             return $this->thumbForImage($file, $sizeName);
+        }else if( $file instanceof GalleryFile ){
+            return $this->thumbForGalleryFile($file, $sizeName);
         }
     }
     
     public function generate(File $file, string $sizeName){
         if( $file instanceof Imagefile ){
             return $this->generateForImage($file, $sizeName);
+        }else if( $file instanceof GalleryFile ){
+            return $this->generateForGalleryFile($file, $sizeName);
         }
     }
     
@@ -76,6 +80,32 @@ class Thumbnailer{
         $thumb = new Thumbnail($fullPath, $file, strval($fullUrl), $sizeName);
         
         return [ $thumb ];
+    }
+    
+    public function generateForGalleryFile(GalleryFile $file, string $sizeName){
+        $ga = $file->getGallery();
+        if( $ga === null ){
+            return [];
+        }
+        
+        $thumbs = [];
+        foreach( $ga->getThumbnails() as $thumbFile ){
+            $thumbs[] = $this->generateForImage($thumbFile, $sizeName)[0];
+        }
+        return $thumbs;
+    }
+    
+    public function thumbForGalleryFile(GalleryFile $file, string $sizeName){
+        $ga = $file->getGallery();
+        if( $ga === null ){
+            return [];
+        }
+        
+        $thumbs = [];
+        foreach( $ga->getThumbnails() as $thumbFile ){
+            $thumbs[] = $this->thumbForImage($thumbFile, $sizeName)[0];
+        }
+        return $thumbs;
     }
     
     protected function getThumbnailDir(string $sizeName, bool $makeIt=false){

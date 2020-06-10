@@ -83,6 +83,12 @@ class ApiController{
         if( isset($data["name"]) ){
             $file->setName($data["name"]);
         }
+        if( $file instanceof GalleryFile && isset($data["gallery_id"]) ){
+            if( ! is_numeric($data["gallery_id"]) ){
+                throw new ApiError("gallery_id must be numeric", 400);
+            }
+            $file->setGalleryId(intval($data["gallery_id"]));
+        }
     }
     
 }
