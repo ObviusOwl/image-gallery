@@ -14,3 +14,5 @@ $conf[ "app.db.host" ] = "db";
 $conf[ "app.db.port" ] = 3306;
 $conf[ "app.db.user" ] = "bilder";
 $conf[ "app.db.password" ] = "bilder";
+
+$conf[ "app.login.readonly" ] = false;

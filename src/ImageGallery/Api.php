@@ -57,7 +57,9 @@ class Api{
     }
     
     public function requireLogin(){
-        // TODO
+        if( $this->conf[ "app.login.readonly" ] ){
+            throw new ApiError("app is in readonly mode", 403);
+        }
     }
 
     protected function loadGallery($id, bool $loadThumbs=false, bool $loadFiles=false){
@@ -114,6 +116,7 @@ class Api{
     }
     
     public function postGallery(Request $req){
+        $this->requireLogin();
         // TODO use given thumbnail file ids and/or generate/autoadd thumbnails
         $data = $req->getBodyAsJson();
         $gallery = new Gallery();
@@ -145,6 +148,7 @@ class Api{
     }
     
     public function patchGallery(Request $req){
+        $this->requireLogin();
         $data = $req->getBodyAsJson();
         $gallery = $this->loadGallery($req->getPathVar("id"), false, false);
         $gallery->clearTaint();
@@ -156,6 +160,7 @@ class Api{
     }
     
     public function deleteGallery(Request $req){
+        $this->requireLogin();
         $data = $req->getBodyAsJson();
         $gallery = $this->loadGallery($req->getPathVar("id"), false, false);
         
@@ -185,6 +190,7 @@ class Api{
     }
     
     public function putGalleryThumbnails(Request $req){
+        $this->requireLogin();
         $data = $req->getBodyAsJson();
         $gallery = $this->loadGallery($req->getPathVar("id"), false, false);
         
@@ -230,6 +236,7 @@ class Api{
     }
     
     public function putGalleryFiles(Request $req){
+        $this->requireLogin();
         $data = $req->getBodyAsJson();
         $gallery = $this->loadGallery($req->getPathVar("id"), false, false);
         
@@ -264,6 +271,7 @@ class Api{
     }
 
     public function patchFile(Request $req){
+        $this->requireLogin();
         $data = $req->getBodyAsJson();
         $file = $this->controller->getFilebyId($req->getPathVar("id"));
         $file->clearTaint();
