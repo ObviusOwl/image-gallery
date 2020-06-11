@@ -45,11 +45,11 @@ class GalleryFileBrowser{
     }
 
     public function listFiles(Path $virtualPath){
-        return $this->db->listGalleryFilesByPath($virtualPath);
+        return $this->db->browseGalleryFiledir($virtualPath);
     }
     
     public function getFile(Path $virtualPath){
-        $file = $this->db->getGalleryFileByPath($virtualPath);
+        $file = $this->db->browseGalleryFile($virtualPath);
         if( $file === null ){
             //throw new FileNotFoundError( "File '$virtualPath' not found" );
             return $this->fileFactory($virtualPath, "inode/directory");

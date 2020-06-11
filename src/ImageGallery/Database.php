@@ -50,11 +50,11 @@ class Database{
         $file = $this->browser->fileFactory(new Path($path), $type);
         $file->setName($name);
         if( $file instanceof ImageFile ){
-            $file->setId(intval($id));
+            $file->setId($id !== null ? intval($id) : null);
             $file->setType($type);
         }else if( $file instanceof GalleryFile ){
-            $file->setId(intval($id));
-            $file->setGalleryId(intval($galleryId));
+            $file->setId($id !== null ? intval($id) : null);
+            $file->setGalleryId($galleryId !== null ? intval($galleryId) : null);
         }
         $file->clearTaint();
         return $file;
@@ -307,7 +307,8 @@ class Database{
         return count($files) == 0 ? null : $files[0];
     }
     
-    public function getGalleryFileByPath(Path $path){
+    public function browseGalleryFile(Path $path){
+        // may return galleryfiles with NULL id
         $path = $path->resolve()->makeAbsolute();
         $q="SELECT files.id, files.path, files.name, files.description, files.type, files.gallery_id 
             FROM files
@@ -322,7 +323,8 @@ class Database{
         return count($files) == 0 ? null : $files[0];
     }
     
-    public function listGalleryFilesByPath(Path $path){
+    public function browseGalleryFiledir(Path $path){
+        // may return galleryfiles with NULL id
         $path = preg_quote(strval($path->resolve()->makeAbsolute()), "&");
         $data = [
             ":file_reg" => "^$path/[^/]+$", 

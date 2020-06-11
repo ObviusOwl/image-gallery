@@ -38,8 +38,8 @@ class Thumbnail{
     }
     
     public function getWidth(){
-        $this->loadImage();
         try{
+            $this->loadImage();
             return $this->image->getImageWidth();
         }catch( \Exception $e ){
             return 0;
@@ -47,8 +47,8 @@ class Thumbnail{
     }
 
     public function getHeight(){
-        $this->loadImage();
         try{
+            $this->loadImage();
             return $this->image->getImageHeight();
         }catch( \Exception $e ){
             return 0;
