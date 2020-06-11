@@ -32,21 +32,29 @@ class GalleryFileBrowser{
     }
     
     public function fileFactory(Path $virtualPath, string $type){
-        if( $type !== "application/x.image-gallery" ){
-            throw new FileNotFoundError(strval($virtualPath));
+        if( $type === "inode/directory" ){
+            $virtualPath = $virtualPath->resolve();
+            list($virtualFullPath, $virtualPath) = $this->splitPath($virtualPath);
+            return new Directory($virtualFullPath, $virtualFullPath, "");
+        }else if( $type === "application/x.image-gallery" ){
+            $virtualPath = $virtualPath->resolve();
+            list($virtualFullPath, $virtualPath) = $this->splitPath($virtualPath);
+            return new GalleryFile($virtualFullPath);
         }
-        $virtualPath = $virtualPath->resolve();
-        list($virtualFullPath, $virtualPath) = $this->splitPath($virtualPath);
-        
-        return new GalleryFile($virtualFullPath);
+        throw new FileNotFoundError(strval($virtualPath));
     }
 
     public function listFiles(Path $virtualPath){
-        throw new FileNotFoundError( "File '$virtualPath' not found" );
+        return $this->db->listGalleryFilesByPath($virtualPath);
     }
     
     public function getFile(Path $virtualPath){
-        throw new FileNotFoundError( "File '$virtualPath' not found" );
+        $file = $this->db->getGalleryFileByPath($virtualPath);
+        if( $file === null ){
+            //throw new FileNotFoundError( "File '$virtualPath' not found" );
+            return $this->fileFactory($virtualPath, "inode/directory");
+        }
+        return $file;
     }
     
 }

@@ -145,8 +145,13 @@ class Database{
     
     public function getGalleryByPath(Path $path){
         $path = $path->resolve()->makeAbsolute();
-        $sql = "SELECT id, name, path FROM galleries WHERE path LIKE :value";
-        $galleries = $this->queryGalleries($sql, [ ":value" => $id ]);
+        $q="SELECT galleries.id, galleries.name, galleries.path
+            FROM galleries
+            JOIN files ON files.gallery_id = galleries.id
+            WHERE galleries.path like :path or files.path like :path
+        ";
+        
+        $galleries = $this->queryGalleries($q, [ ":path" => strval($path) ]);
         return count($galleries) == 0 ? null : $galleries[0];
     }
     
@@ -300,6 +305,56 @@ class Database{
         ";
         $files = $this->queryFiles($q, [ ":id" => $id ]);
         return count($files) == 0 ? null : $files[0];
+    }
+    
+    public function getGalleryFileByPath(Path $path){
+        $path = $path->resolve()->makeAbsolute();
+        $q="SELECT files.id, files.path, files.name, files.description, files.type, files.gallery_id 
+            FROM files
+            WHERE files.gallery_id IS NOT NULL AND files.path LIKE :path
+            
+            UNION ALL
+            SELECT NULL, galleries.path, galleries.name, NULL, 'application/x.image-gallery', galleries.id 
+            FROM galleries
+            WHERE galleries.path LIKE :path
+        ";
+        $files = $this->queryFiles($q, [ ":path" => strval($path) ]);
+        return count($files) == 0 ? null : $files[0];
+    }
+    
+    public function listGalleryFilesByPath(Path $path){
+        $path = preg_quote(strval($path->resolve()->makeAbsolute()), "&");
+        $data = [
+            ":file_reg" => "^$path/[^/]+$", 
+            ":dir_reg" =>  "^$path/[^/]+/", 
+            ":dir_reg2" => "^$path/[^/]+",
+        ];
+        
+        $q="SELECT DISTINCT * FROM (
+        	SELECT files.id, files.path, files.name, files.description, files.type, files.gallery_id 
+            FROM files
+            WHERE files.gallery_id IS NOT NULL AND files.path REGEXP :file_reg
+            
+        	UNION ALL
+        	SELECT NULL, galleries.path, galleries.name, NULL, 'application/x.image-gallery', galleries.id 
+            FROM galleries
+            WHERE galleries.path REGEXP :file_reg
+
+            UNION ALL
+        	SELECT NULL, REGEXP_SUBSTR(files.path, :dir_reg2), NULL, NULL, 'inode/directory', NULL
+            FROM files
+            where files.gallery_id is not NULL and files.path regexp :dir_reg
+
+            UNION ALL
+        	SELECT NULL, REGEXP_SUBSTR(galleries.path, :dir_reg2), NULL, NULL, 'inode/directory', NULL 
+        	FROM galleries
+            WHERE galleries.path REGEXP :dir_reg
+
+        ) AS dirlist GROUP BY path
+        ";
+        
+        $files = $this->queryFiles($q, $data);
+        return $files;
     }
     
     public function getOrCreateFile(File $file){
