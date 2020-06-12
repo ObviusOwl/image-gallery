@@ -1,4 +1,13 @@
-composer.lock
 vendor/
+composer.lock
+
+node_modules
+yarn.lock
+yarn-debug.log*
+yarn-error.log*
+
+public/assets/bundle.css
+public/assets/bundle.js
+public/assets/bundle.js.map
 
 config/config.php
