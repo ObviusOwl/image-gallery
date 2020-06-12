@@ -25,7 +25,7 @@ export default {
     
     methods: {
         fileThumbUrl: function(file){
-            let thumbs = this.thumbnails.filter( t => t.size_name === "M" );
+            let thumbs = file.thumbnails.filter( t => t.size_name === "M" );
             return thumbs.length != 0 ? thumbs[0].file_url : "";
         },
         onThumbClick: function(idx){
