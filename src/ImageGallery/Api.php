@@ -34,7 +34,8 @@ class Api{
         
         $r->route("GET", "/files/:id", [ $this, "getFile" ]);
         $r->route("PATCH", "/files/:id", [ $this, "patchFile" ]);
-        
+
+        $r->default([ $this, "optionsCallback" ], "OPTIONS");
         $r->default( function($r){ return new ApiError( "API '{$r->path}' not found", 404 ); } );
     }
     
@@ -52,11 +53,16 @@ class Api{
         }else if( ! ($res instanceof ApiResponse) ){
             $res = new ApiError("Invalid response type", 500);
         }
+
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Credentials: false");
         
         $res->display();
     }
     
     public function requireLogin(){
+        // Note: do not use cookies/session here, due to CORS
+        // https://www.php.net/manual/en/book.oauth.php
         if( $this->conf[ "app.login.readonly" ] ){
             throw new ApiError("app is in readonly mode", 403);
         }
@@ -71,6 +77,17 @@ class Api{
             $this->db->galleryLoadFiles($gallery);
         }
         return $gallery;
+    }
+    
+    public function optionsCallback(Request $req){
+        if( isset($_SERVER["HTTP_ACCESS_CONTROL_REQUEST_METHOD"]) ){
+            header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT");
+        }
+
+        if( isset($_SERVER["HTTP_ACCESS_CONTROL_REQUEST_HEADERS"]) ){
+            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+        }
+        return new ApiResponseJson( [], 200 );
     }
     
     public function postFilebrowserFiles(Request $req){
