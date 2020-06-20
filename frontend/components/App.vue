@@ -17,6 +17,7 @@
             v-bind:tile-max-height="250"
             
             v-on:open-file="onOpenFile" 
+            v-on:open-gallery="onOpenGallery"
         ></image-gallery>
     </div>
 </template>
@@ -53,6 +54,15 @@ export default {
     methods: {
         onOpenFile(file){
             this.file = file;
+        },
+        onOpenGallery(file){
+            let params = new URLSearchParams(window.location.search);
+            params.set("gallery", file.gallery_id);
+            let url = window.location.protocol + "//" 
+                + window.location.host 
+                + window.location.pathname 
+                + '?' + params.toString();
+            window.location.href = url;
         },
         onCloseFile(){
             this.file = null;

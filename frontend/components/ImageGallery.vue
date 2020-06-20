@@ -122,7 +122,7 @@ export default {
         
         onTileClick(file){
             if( file.type == "application/x.image-gallery" ){
-                window.location.href = `index.php?gallery=${file.gallery_id}`;
+                this.$emit("open-gallery", file);
             }else{
                 this.$emit("open-file", file);
             }
