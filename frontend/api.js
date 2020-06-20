@@ -1,8 +1,8 @@
 
 export class Api{
     
-    constructor(){
-        
+    constructor(apiUrl){
+        this.apiUrl = apiUrl;
     }
     
     encodeQueryString( data ){
@@ -67,7 +67,7 @@ export class Api{
     
     getGallery(id){
         let opts = {
-            url : `api.php/galleries/${id}`,
+            url : this.apiUrl + `/galleries/${id}`,
             method: "GET",
         };
         return this.apiCall(opts);

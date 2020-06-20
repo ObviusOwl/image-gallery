@@ -5,8 +5,12 @@ import { Api } from './api.js';
 export class Store{
     
     constructor(){
-        this.api = new Api();
+        this.api = new Api("api.php");
         this.gallery = {};
+    }
+    
+    setApiUrl(apiUrl){
+        this.api = new Api(apiUrl);
     }
     
     loadGallery(id){
